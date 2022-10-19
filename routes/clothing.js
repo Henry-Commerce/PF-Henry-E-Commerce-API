@@ -217,15 +217,13 @@ router.get('/oferts', async (req, res) => {
   }
 });
 
-router.get('/allreviews', async (req, res) => {
+router.get('/allreviews', verifyToken, async (req, res) => {
   try {
     var response = await ClothingModel.find({});
-    response=response.filter((el)=>el.comments.length>0)
-    var name=response.map(a=>a.name)
-    var comments=response.map(a=>a.comments)
-    res.send(comments);
+    response = response.filter((el) => el.comments.length > 0);
+    res.json(response);
   } catch (error) {
-    console.log( error);
+    console.log(error);
   }
 });
 
@@ -314,7 +312,9 @@ router.put('/reviewupdate', verifyToken, async (req, res) => {
     });
     const commentsArray = foundCloth.comments;
     if (isDeleting) {
-      const leftoverReviews = commentsArray.filter(element => element.email !== email);
+      const leftoverReviews = commentsArray.filter(
+        (element) => element.email !== email
+      );
       await ClothingModel.findOneAndUpdate(
         { name },
         { comments: leftoverReviews }
